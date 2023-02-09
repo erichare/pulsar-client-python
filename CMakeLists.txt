@@ -86,6 +86,11 @@ endif ()
 
 message(STATUS "All libraries: ${PYTHON_WRAPPER_LIBS}")
 
+if (APPLE)
+    set(CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS "${CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS} -undefined dynamic_lookup")
+    target_link_libraries(_pulsar -Wl,-all_load ${PYTHON_WRAPPER_LIBS})
+endif()
+
 if (LINK_STATIC AND NOT MSVC)
     set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
 
@@ -116,11 +121,7 @@ if (LINK_STATIC AND NOT MSVC)
                         ${LIB_SNAPPY}
                         ${CURL_LIBRARIES}
                         )
-
-    if (APPLE)
-        set(CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS "${CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS} -undefined dynamic_lookup")
-        target_link_libraries(_pulsar -Wl,-all_load ${PYTHON_WRAPPER_LIBS})
-    else ()
+    if (NOT APPLE)
         if (NOT MSVC)
           set (CMAKE_SHARED_LINKER_FLAGS " -static-libgcc  -static-libstdc++")
         endif()
